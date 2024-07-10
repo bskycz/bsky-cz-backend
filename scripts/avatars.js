@@ -20,7 +20,7 @@ for (const user of users) {
         const fwe = user.did + ".avif"
         const tfn = OUTPUT_DIR + "/thumb/" + fwe
         if (!await (Bun.file(tfn)).exists()) {
-            await $`convert ${fn} -resize 200x200^ -gravity center -extent 200x200 ${tfn}`
+            await $`/usr/bin/convert ${fn} -resize 200x200^ -gravity center -extent 200x200 ${tfn}`
         }
     }
 }
