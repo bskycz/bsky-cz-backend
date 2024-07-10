@@ -8,15 +8,15 @@ const users = db.query("select * from users").all()
 
 // stats
 const periods = [
-    [ "day", 1 ],
-    [ "week", 7 ],
-    [ "month", 30 ],    
+    ["day", 1],
+    ["week", 7],
+    ["month", 30],
 ]
 
 const stats = {}
 for (const p of periods) {
     console.log(`Generating stats [${p[0]}] ..`)
-    stats[p[0]] = db.query("SELECT u.did, COUNT(p.uri) AS count FROM users u LEFT JOIN posts p ON u.did = p.author WHERE julianday('now') - julianday(p.createdAt) <= $days AND u.included = 1 GROUP BY u.did ORDER BY count DESC").all({ 
+    stats[p[0]] = db.query("SELECT u.did, COUNT(p.uri) AS count FROM users u LEFT JOIN posts p ON u.did = p.author WHERE julianday('now') - julianday(p.createdAt) <= $days AND u.included = 1 GROUP BY u.did ORDER BY count DESC").all({
         $days: p[1]
     })
 }
@@ -29,5 +29,7 @@ const userStats = db.query("WITH RECURSIVE dates(date) AS (SELECT DATE('2023-04-
 
 console.log('Writing ..')
 await Bun.write('./dist/data.json', JSON.stringify({ users, stats, postStats, userStats, time: (new Date).toISOString() }, null, 2))
+await Bun.write('./dist/users.json', JSON.stringify({ users, time: (new Date).toISOString() }, null, 2))
+await Bun.write('./dist/stats.json', JSON.stringify({ stats, postStats, userStats, time: (new Date).toISOString() }, null, 2))
 
 console.log('done')

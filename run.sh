@@ -1,5 +1,7 @@
 #!/bin/sh
 
+PATH=~/.bun/bin
+
 bun scripts/session.js \
 && bun scripts/posts.js \
 && bun scripts/profiles.js \

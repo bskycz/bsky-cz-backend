@@ -3,3 +3,4 @@
 *.zip
 db.*
 dist
+cron_log.txt

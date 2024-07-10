@@ -2,6 +2,7 @@ import { Database } from "bun:sqlite";
 
 const db = new Database("db.sqlite")
 
+console.log(`Stats for users .. `)
 const users = db.query('select * from users').all()
 for (const user of users) {
     //console.log(user.did)
@@ -10,7 +11,7 @@ for (const user of users) {
         const lastPost = db.query('select uri, createdAt from posts where author=$author order by createdAt desc limit 1').get({ $author: user.did })
         const firstPost = db.query('select uri, createdAt from posts where author=$author order by createdAt asc limit 1').get({ $author: user.did })
         const postActivity = db.query('select sum(likeCount) as likeCountSum, sum(replyCount) as replyCountSum, sum(repostCount) as repostCountSum from posts where author=$author').get({ $author: user.did })
-        console.log(`user: ${user.handle}, posts: ${posts.count} (${JSON.stringify(postActivity)})`)
+        //console.log(`user: ${user.handle}, posts: ${posts.count} (${JSON.stringify(postActivity)})`)
         db.query('update users set localPosts=$localPosts, localPostsRatio=$localPostsRatio, lastPostDate=$lastPostDate, firstPostDate=$firstPostDate, followerPostRatio=$followerPostRatio, included=$included, likeCountSum=$likeCountSum, replyCountSum=$replyCountSum, repostCountSum=$repostCountSum where did=$did').run({
             $did: user.did,
             $localPosts: posts.count,
@@ -23,5 +24,7 @@ for (const user of users) {
             $replyCountSum: postActivity.replyCountSum,
             $repostCountSum: postActivity.repostCountSum,
         })
+        //process.stdout.write('.')
     }
 }
+console.log("done")
