@@ -10,6 +10,7 @@ if (!handle) {
 const resp = await fetch("https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=" + handle)
 const json = await resp.json()
 const did = json?.did
+console.log({ did })
 
 if (json.error) {
     console.error(json)

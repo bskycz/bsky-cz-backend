@@ -1,4 +1,5 @@
 import { Database } from "bun:sqlite";
+import { $ } from "bun"
 
 const db = new Database("db.sqlite")
 
@@ -32,5 +33,8 @@ const time = (new Date).toISOString()
 await Bun.write('./dist/index.json', JSON.stringify({ users, stats, postStats, userStats, time }, null, 2))
 await Bun.write('./dist/users.json', JSON.stringify({ users, time }, null, 2))
 await Bun.write('./dist/stats.json', JSON.stringify({ stats, postStats, userStats, time }, null, 2))
+
+console.log('Compressing bundle into archive ..')
+await $`/usr/bin/zstd -z -15 -o ./dist/dumps/${time}.zst ./dist/index.json`
 
 console.log('done', time)

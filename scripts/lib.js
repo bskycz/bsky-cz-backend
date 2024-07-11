@@ -1,4 +1,4 @@
-export async function getPosts (uris) {
+export async function getPosts(uris) {
     const query = uris.map(u => `uris%5B%5D=${encodeURIComponent(u)}`).join('&')
     const req = await fetch(`https://${process.env.BSKY_PDS}/xrpc/app.bsky.feed.getPosts?${query}`, {
         headers: {
@@ -7,32 +7,45 @@ export async function getPosts (uris) {
     })
     const json = await req.json()
     if (!json.posts) {
-        console.log(json)
+        console.error(json)
     }
 
     return { posts: json.posts, remainingLimit: req.headers.get('ratelimit-remaining') }
 }
 
 
-export async function getSearchPosts (q, limit = 100, cursor = 0) {
+export async function getSearchPosts(q, limit = 100, cursor = 0) {
     const req = await fetch(`https://${process.env.BSKY_PDS}/xrpc/app.bsky.feed.searchPosts?q=${encodeURIComponent(q)}&limit=${limit}&cursor=${cursor}&sort=latest`, {
         headers: {
             Authorization: `Bearer ${process.env.BSKY_TOKEN}`
         }
     })
     const json = await req.json()
-    //console.log(json)
     if (!json.posts) {
-        console.log(json)
+        console.error(json)
     }
 
     return { posts: json.posts, remainingLimit: req.headers.get('ratelimit-remaining') }
 }
 
-export async function indexPosts (db, q, limit = 100, cursor = 0) {
+export async function getAuthorPosts(actor, limit = 100, cursor = "") {
+    const req = await fetch(`https://${process.env.BSKY_PDS}/xrpc/app.bsky.feed.getAuthorFeed?actor=${encodeURIComponent(actor)}&limit=${limit}&filter=posts_with_replies&cursor=${cursor}`, {
+        headers: {
+            Authorization: `Bearer ${process.env.BSKY_TOKEN}`
+        }
+    })
+    const json = await req.json()
+    if (!json.feed) {
+        console.error(json)
+    }
+    const posts = json.feed.map(fp => fp.post).filter(p => p.author.handle === actor)
+    return { posts, currentCursor: json.cursor, remainingLimit: req.headers.get('ratelimit-remaining') }
+}
+
+export async function indexPosts(db, q, limit = 100, cursor, method = "search") {
     const insertedAuthors = []
     const inserted = []
-    const { posts, remainingLimit } = await getSearchPosts(q, limit, cursor)
+    const { posts, remainingLimit, currentCursor } = method === "search" ? await getSearchPosts(q, limit, cursor) : await getAuthorPosts(q, limit, cursor)
     for (const post of posts) {
         const exists = db.query('select uri from posts where uri=$uri').get({ $uri: post.uri })
         if (!exists && post.record) {
@@ -42,7 +55,6 @@ export async function indexPosts (db, q, limit = 100, cursor = 0) {
             inserted.push(post.uri)
         }
 
-        //console.log(post.author.handle)
         const userExists = db.query('SELECT * FROM users WHERE did=$did').get({ $did: post.author.did })
         if (!userExists) {
             db.query(`INSERT INTO users (handle, did, indexedAt) VALUES ($handle, $did, datetime('now'))`).run({ $handle: post.author.handle, $did: post.author.did })
@@ -50,7 +62,7 @@ export async function indexPosts (db, q, limit = 100, cursor = 0) {
         }
     }
     const lastDate = posts[0]?.record.createdAt
-    console.log(`[${q} ${cursor}] [len=${posts.length}] posts+${inserted.length} people+${insertedAuthors.length} {left=${remainingLimit}}`)
+    console.log(`[${q} ${cursor || null}] [len=${posts.length}] posts+${inserted.length} people+${insertedAuthors.length} {left=${remainingLimit}}`)
 
-    return { insertedCount: inserted.length, lastDate }
+    return { insertedCount: inserted.length, lastDate, currentCursor }
 }

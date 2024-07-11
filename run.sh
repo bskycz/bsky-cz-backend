@@ -9,3 +9,4 @@ bun scripts/session.js \
 && bun scripts/avatars.js \
 && bun scripts/dump.js \
 && bun scripts/list.js \
+&& bun scripts/archive.js

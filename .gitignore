@@ -2,5 +2,7 @@
 .DS_Store
 *.zip
 db.*
+bsky-cz-*
 dist
 cron_log.txt
+tmp
