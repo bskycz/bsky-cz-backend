@@ -33,8 +33,11 @@ const time = (new Date).toISOString()
 await Bun.write('./dist/index.json', JSON.stringify({ users, stats, postStats, userStats, time }, null, 2))
 await Bun.write('./dist/users.json', JSON.stringify({ users, time }, null, 2))
 await Bun.write('./dist/stats.json', JSON.stringify({ stats, postStats, userStats, time }, null, 2))
+await $`/usr/bin/zstd -z -f -19 -o ./dist/index.json.zst ./dist/index.json`
+await $`/usr/bin/zstd --format=gzip -f -z -19 -o ./dist/index.json.gz ./dist/index.json`
 
 console.log('Compressing bundle into archive ..')
-await $`/usr/bin/zstd -z -15 -o ./dist/dumps/${time}.zst ./dist/index.json`
+await $`/usr/bin/zstd -z -f -15 -o ./dist/dumps/${time}.zst ./dist/index.json`
+await $`cd ./dist/dumps && rm -f latest.zst && ln -s ./${time}.zst latest.zst`
 
 console.log('done', time)

@@ -24,11 +24,11 @@ for (const user of current) {
         continue
     }
     if (user.followers !== prev.followers) {
-        console.log(user.handle, [user.followers, prev.followers])
+        console.log(user.handle, 'followers', [user.followers, prev.followers])
     }
-    if (user.likeCountSum !== prev.likeCountSum) {
-        console.log(user.handle, [user.likeCountSum, prev.likeCountSum])
-    }
+    /*if (user.likeCountSum !== prev.likeCountSum) {
+        console.log(user.handle, 'likes', [user.likeCountSum, prev.likeCountSum])
+    }*/
 }
 
 await $`rm -f ${tmpFile}`
