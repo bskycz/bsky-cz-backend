@@ -7,3 +7,4 @@ dist
 cron_log.txt
 tmp
 run.lock
+dump.*

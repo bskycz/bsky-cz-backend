@@ -40,7 +40,7 @@ async function getProfiles(users) {
 
 let total = 0
 while (true) {
-    const users = db.query("select handle, did, profileLastUpdated from users where (profileLastUpdated is NULL or (((included = 1 or czechNational = 1) AND (julianday('now') - julianday(profileLastUpdated)) * 24 > 0.25) OR (included = 0 AND (julianday('now') - julianday(profileLastUpdated)) > 0.5))) and deleted = 0 limit 25").all()
+    const users = db.query("select handle, did, profileLastUpdated from users where (profileLastUpdated is NULL or (((included = 1 or czechNational = 1) AND (julianday('now') - julianday(profileLastUpdated)) * 24 > 0.5) OR (included = 0 AND (julianday('now') - julianday(profileLastUpdated)) * 24 > 2))) and deleted = 0 limit 25").all()
 
     if (users.length === 0) {
         console.log('Done')
