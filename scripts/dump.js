@@ -38,6 +38,6 @@ await $`/usr/bin/zstd --format=gzip -f -z -19 -o ./dist/index.json.gz ./dist/ind
 
 console.log('Compressing bundle into archive ..')
 await $`/usr/bin/zstd -z -f -15 -o ./dist/dumps/${time}.zst ./dist/index.json`
-await $`cd ./dist/dumps && rm -f latest.zst && ln -s ./${time}.zst latest.zst`
+await $`cd ./dist/dumps && rm -f latest.zst && /usr/bin/ln -s ./${time}.zst latest.zst`
 
 console.log('done', time)

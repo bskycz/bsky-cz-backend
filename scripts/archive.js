@@ -16,5 +16,5 @@ if (!files.includes(date)) {
     await $`/usr/bin/zip -9 ./tmp/tmpfile.zip ./db.sqlite`
     await $`mv ./tmp/tmpfile.zip ${target}`
 
-    await $`cd ./dist/archive && rm -f latest.zip && ln -s ./bsky-cz-${date}.zip latest.zip`
+    await $`cd ./dist/archive && rm -f latest.zip && /usr/bin/ln -s ./bsky-cz-${date}.zip latest.zip`
 }
