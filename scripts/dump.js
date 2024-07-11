@@ -30,14 +30,12 @@ const userStats = db.query("WITH RECURSIVE dates(date) AS (SELECT DATE('2023-04-
 
 console.log('Writing ..')
 const time = (new Date).toISOString()
-await Bun.write('./dist/index.json', JSON.stringify({ users, stats, postStats, userStats, time }, null, 2))
-await Bun.write('./dist/users.json', JSON.stringify({ users, time }, null, 2))
-await Bun.write('./dist/stats.json', JSON.stringify({ stats, postStats, userStats, time }, null, 2))
-await $`/usr/bin/zstd -z -f -19 -o ./dist/index.json.zst ./dist/index.json`
-await $`/usr/bin/zstd --format=gzip -f -z -19 -o ./dist/index.json.gz ./dist/index.json`
+await Bun.write('./dist/bundle.json', JSON.stringify({ users, stats, postStats, userStats, time }, null, 2))
+await $`/usr/bin/zstd -z -f -19 -o ./dist/bundle.json.zst ./dist/bundle.json`
 
 console.log('Compressing bundle into archive ..')
-await $`/usr/bin/zstd -z -f -15 -o ./dist/dumps/${time}.zst ./dist/index.json`
-await $`cd ./dist/dumps && rm -f latest.zst && /usr/bin/ln -s ./${time}.zst latest.zst`
+await $`/usr/bin/zstd --format=gzip -f -z -19 -o ./dist/bundle.json.gz ./dist/bundle.json`
+await $`/usr/bin/cp ./dist/bundle.json.zst ./dist/bundles/${time}.json.zst`
+await $`cd ./dist/bundles && rm -f latest.json.zst && /usr/bin/ln -s ./${time}.json.zst latest.json.zst`
 
 console.log('done', time)
