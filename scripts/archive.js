@@ -16,7 +16,7 @@ if (!files.includes(date)) {
     await $`/usr/bin/sqlite3 ./db.sqlite .dump | /usr/bin/zstd -z -T4 -10 -o ./tmp/tmpfile.zst -`
 
     //await $`/usr/bin/zip -9 ./tmp/tmpfile.zip ./db.sqlite`
-    await $`/usr/bin/mv ./tmp/tmpfile.zst ${target} && chmod go+r ${target}`
+    await $`/usr/bin/mv ./tmp/tmpfile.zst ${target} && /usr/bin/chmod go+r ${target}`
 
     await $`cd ./dist/archives && rm -f latest.sql.zst && /usr/bin/ln -s ./bsky-cz-${date}.sql.zst latest.sql.zst`
     await $`cd ./dist && rm -f archive.sql.zst && /usr/bin/ln -s ./archives/bsky-cz-${date}.sql.zst archive.sql.zst`

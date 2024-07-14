@@ -29,7 +29,9 @@ for (const user of current) {
     const changes = {}
     if (user.followers !== prev.followers) {
         const diff = user.followers - prev.followers
-        followers.push({ handle: user.handle, incl: user.included, pre: prev.followers, cur: user.followers, diff: (diff > 0 ? "+" : "") + diff })
+        if (user.included) {
+            followers.push({ handle: user.handle, pre: prev.followers, cur: user.followers, diff: (diff > 0 ? "+" : "") + diff })
+        }
         changes['followers'] = diff
         //console.table(user.handle, 'followers', [user.followers, prev.followers])
     }
@@ -58,6 +60,11 @@ for (const user of current) {
         const diff = user.localPosts - prev.localPosts
         //reposts.push({ handle: user.handle, incl: user.included, pre: prev.localPosts, cur: user.localPosts, diff: (diff > 0 ? "+" : "") + diff })
         changes['localPosts'] = diff
+    }
+    if (user.posts !== prev.posts) {
+        const diff = user.posts - prev.posts
+        //reposts.push({ handle: user.handle, incl: user.included, pre: prev.localPosts, cur: user.localPosts, diff: (diff > 0 ? "+" : "") + diff })
+        changes['posts'] = diff
     }
 
     if (Object.keys(changes).length > 0) {

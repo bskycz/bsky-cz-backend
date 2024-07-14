@@ -66,3 +66,21 @@ export async function indexPosts(db, q, limit = 100, cursor, method = "search") 
 
     return { insertedCount: inserted.length, lastDate, currentCursor }
 }
+
+export async function locker() {
+    let lockedState = null
+    while (lockedState || lockedState === null) {
+        const locked = await (Bun.file("./run.lock").exists())
+        if (locked) {
+            if (lockedState) {
+                process.stdout.write('.')
+            } else {
+                process.stdout.write("\n[!] lock exists, sleeping: ")
+            }
+            lockedState = true
+            await new Promise(r => setTimeout(r, 1000))
+        } else {
+            lockedState = false
+        }
+    }
+}

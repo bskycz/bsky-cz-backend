@@ -22,7 +22,7 @@ for (const user of users) {
             $lastPostDate: lastPost?.createdAt,
             $firstPostDate: firstPost?.createdAt,
             $followerPostRatio: user.followers > 0 ? Math.round((user.followers / (user.posts)) * 100) / 100 : 0,
-            $included: Boolean(localPostsRatio >= 0.5 && posts.count >= 5 && user.redacted == 0 && user.optout == 0 && user.deleted == 0),
+            $included: Boolean(localPostsRatio >= 0.25 && posts.count >= 5 && user.redacted == 0 && user.optout == 0 && user.deleted == 0),
             $likeCountSum: postActivity.likeCountSum,
             $replyCountSum: postActivity.replyCountSum,
             $repostCountSum: postActivity.repostCountSum,
