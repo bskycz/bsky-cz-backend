@@ -13,7 +13,7 @@ for (const f of files) {
 	}
 	const date = new Date(m[1])
 	const diff = differenceInMinutes(date, prev)
-	const toDelete = diff < 60
+	const toDelete = diff < 120
 	console.log((toDelete ? '-' : '+') + ' ' + JSON.stringify({ f, diff, toDelete }))
 	if (toDelete) {
 		const fn = join(bundleDir, f)

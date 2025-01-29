@@ -15,6 +15,8 @@ export async function getPosts(uris) {
 
 
 export async function getSearchPosts(q, limit = 100, cursor = 0) {
+    const startTime = performance.now();
+    
     const req = await fetch(`https://${process.env.BSKY_PDS}/xrpc/app.bsky.feed.searchPosts?q=${encodeURIComponent(q)}&limit=${limit}&cursor=${cursor}&sort=latest`, {
         headers: {
             Authorization: `Bearer ${process.env.BSKY_TOKEN}`
@@ -25,7 +27,14 @@ export async function getSearchPosts(q, limit = 100, cursor = 0) {
         console.error(json)
     }
 
-    return { posts: json.posts, remainingLimit: req.headers.get('ratelimit-remaining') }
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    return { 
+        posts: json.posts, 
+        remainingLimit: req.headers.get('ratelimit-remaining'),
+        duration: Math.round(duration) // Duration in milliseconds
+    }
 }
 
 export async function getAuthorPosts(actor, limit = 100, cursor = "") {
@@ -45,7 +54,7 @@ export async function getAuthorPosts(actor, limit = 100, cursor = "") {
 export async function indexPosts(db, q, limit = 100, cursor, method = "search") {
     const insertedAuthors = []
     const inserted = []
-    const { posts, remainingLimit, currentCursor } = method === "search" ? await getSearchPosts(q, limit, cursor) : await getAuthorPosts(q, limit, cursor)
+    const { posts, remainingLimit, currentCursor, duration } = method === "search" ? await getSearchPosts(q, limit, cursor) : await getAuthorPosts(q, limit, cursor)
     for (const post of posts) {
         const exists = db.query('select uri from posts where uri=$uri').get({ $uri: post.uri })
         if (!exists && post.record) {
@@ -62,7 +71,7 @@ export async function indexPosts(db, q, limit = 100, cursor, method = "search") 
         }
     }
     const lastDate = posts[0]?.record.createdAt
-    console.log(`[${q} ${cursor || null}] [len=${posts.length}] posts+${inserted.length} people+${insertedAuthors.length} {left=${remainingLimit}}`)
+    console.log(`[${q} ${cursor || null}] [len=${posts.length} ${duration}ms] posts+${inserted.length} people+${insertedAuthors.length} {left=${remainingLimit},lastDate=${lastDate}}`)
 
     return { insertedCount: inserted.length, lastDate, currentCursor }
 }

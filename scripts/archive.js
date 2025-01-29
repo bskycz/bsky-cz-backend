@@ -12,15 +12,16 @@ if (!files.includes(date)) {
     const target = `./dist/archives/bsky-cz-${date}.sql.zst`
 
     console.log(`Dumping SQLite3 db to sql and writing archive: ${target}`)
-    await $`rm -f ./tmp/tmpfile.zst`
+    await $`/usr/bin/rm -f ./tmp/tmpfile.zst`
     await $`/usr/bin/sqlite3 ./db.sqlite .dump | /usr/bin/zstd -z -T4 -10 -o ./tmp/tmpfile.zst -`
 
     //await $`/usr/bin/zip -9 ./tmp/tmpfile.zip ./db.sqlite`
     await $`/usr/bin/mv ./tmp/tmpfile.zst ${target} && /usr/bin/chmod go+r ${target}`
 
-    await $`cd ./dist/archives && rm -f latest.sql.zst && /usr/bin/ln -s ./bsky-cz-${date}.sql.zst latest.sql.zst`
-    await $`cd ./dist && rm -f archive.sql.zst && /usr/bin/ln -s ./archives/bsky-cz-${date}.sql.zst archive.sql.zst`
-    await $`rm -f ./tmp/tmpfile.zst`
+    await $`cd ./dist && /usr/bin/rm -f archive.sql && /usr/bin/cp ${target} latest.sql`
+    await $`cd ./dist/archives && /usr/bin/rm -f latest.sql.zst && /usr/bin/ln -s ./bsky-cz-${date}.sql.zst latest.sql.zst`
+    await $`cd ./dist && /usr/bin/rm -f archive.sql.zst && /usr/bin/ln -s ./archives/bsky-cz-${date}.sql.zst archive.sql.zst`
+    await $`/usr/bin/rm -f ./tmp/tmpfile.zst`
 }
 
 console.log('archiving done', date)
